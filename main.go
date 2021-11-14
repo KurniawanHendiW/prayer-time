@@ -18,7 +18,7 @@ func main() {
 
 	router := initRouter(cfg)
 
-	util.RunServerGracefully(cfg.RestPort, cfg.TimeOut, router)
+	util.RunServerGracefully(cfg.PORT, cfg.TimeOut, router)
 }
 
 func initRouter(cfg config.Config) *gin.Engine {
