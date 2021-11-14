@@ -21,15 +21,15 @@ type service struct {
 	waktuSholatSvc waktusholat.Service
 	redisSvc       redis.Service
 	serviceHost    string
-	passKey        string
+	expiredKey     int64
 }
 
-func NewService(waktuSholatSvc waktusholat.Service, redisSvc redis.Service, serviceHost, passKey string) Service {
+func NewService(waktuSholatSvc waktusholat.Service, redisSvc redis.Service, serviceHost string, expiredKey int64) Service {
 	return &service{
 		waktuSholatSvc: waktuSholatSvc,
 		redisSvc:       redisSvc,
 		serviceHost:    serviceHost,
-		passKey:        passKey,
+		expiredKey:     expiredKey,
 	}
 }
 
@@ -41,13 +41,19 @@ func (s *service) GetKeyPrayerTime(req KeyPrayerTimeRequest) (KeyPrayerTimeRespo
 
 	serial := uuid.NewV4()
 
-	if err = s.redisSvc.Set(fmt.Sprintf("prayer-time-%s", serial.String()), string(byteData)).Error; err != nil {
+	redisKey := fmt.Sprintf("prayer-time-%s", serial.String())
+	if err = s.redisSvc.Set(redisKey, string(byteData)).Error; err != nil {
+		return KeyPrayerTimeResponse{}, err
+	}
+
+	if err = s.redisSvc.Expire(redisKey, s.expiredKey).Error; err != nil {
 		return KeyPrayerTimeResponse{}, err
 	}
 
 	return KeyPrayerTimeResponse{
-		Key: serial.String(),
-		Url: fmt.Sprintf("%s/prayer-time/get?key=%s", s.serviceHost, serial.String()),
+		Key:     serial.String(),
+		Url:     fmt.Sprintf("%s/prayer-time/get?key=%s", s.serviceHost, serial.String()),
+		Message: fmt.Sprintf("Url expired in %d minutes", s.expiredKey/60),
 	}, nil
 }
 

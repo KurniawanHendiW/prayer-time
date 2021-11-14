@@ -33,8 +33,9 @@ type (
 	}
 
 	KeyPrayerTimeResponse struct {
-		Url string `json:"url"`
-		Key string `json:"key"`
+		Url     string `json:"url"`
+		Key     string `json:"key"`
+		Message string `json:"message"`
 	}
 
 	DataPrayerTimeRequest struct {
