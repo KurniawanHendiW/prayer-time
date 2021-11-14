@@ -60,6 +60,10 @@ func (s *service) GetKeyPrayerTime(req KeyPrayerTimeRequest) (KeyPrayerTimeRespo
 func (s *service) GetDataPrayerTime(req DataPrayerTimeRequest) (DataPrayerTimeResponse, error) {
 	redisData, err := s.redisSvc.Get(fmt.Sprintf("prayer-time-%s", req.Key)).String()
 	if err != nil {
+		if redis.IsErrorNil(err) {
+			return DataPrayerTimeResponse{}, fmt.Errorf("URL is expired")
+		}
+
 		return DataPrayerTimeResponse{}, err
 	}
 

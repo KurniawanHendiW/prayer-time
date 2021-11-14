@@ -7,7 +7,7 @@ import (
 type Config struct {
 	// Service
 	Host       string `envconfig:"HOST" default:""`
-	RestPort   int    `envconfig:"REST_PORT" default:"80"`
+	PORT       int    `envconfig:"PORT" default:"80"`
 	TimeOut    int    `envconfig:"TIME_OUT" default:"3"`
 	ExpiredKey int64  `envconfig:"EXPIRED_KEY" default:"600"` // in seconds
 

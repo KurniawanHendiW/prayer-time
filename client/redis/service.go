@@ -118,3 +118,7 @@ func (rp *Reply) Int64() (int64, error) {
 func (rp *Reply) ArrByte() ([]byte, error) {
 	return redis.Bytes(rp.Result, rp.Error)
 }
+
+func IsErrorNil(err error) bool {
+	return err == redis.ErrNil
+}
