@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/prayer-time/client/redis"
@@ -15,6 +16,8 @@ import (
 
 func main() {
 	cfg := config.Get()
+
+	fmt.Printf("CONFIG: \n%+v\n\n", cfg)
 
 	router := initRouter(cfg)
 
