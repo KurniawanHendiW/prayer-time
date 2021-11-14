@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 
+	"github.com/prayer-time/client/redis"
 	"github.com/prayer-time/client/waktusholat"
 	"github.com/prayer-time/config"
 	"github.com/prayer-time/handler"
@@ -23,7 +24,15 @@ func main() {
 func initRouter(cfg config.Config) *gin.Engine {
 	// init service
 	waktuSholatSvc := waktusholat.NewService(cfg.WaktuSholatHost)
-	prayerTimeSvc := prayerTime.NewService(waktuSholatSvc, cfg.PassKey)
+	redisSvc := redis.NewService(redis.RedisConfig{
+		Host:      cfg.RedisHost,
+		Port:      cfg.RedisPort,
+		Password:  cfg.RedisPassword,
+		Timeout:   cfg.RedisTimeout,
+		MaxIdle:   cfg.RedisMaxIdle,
+		MaxActive: cfg.RedisMaxActive,
+	})
+	prayerTimeSvc := prayerTime.NewService(waktuSholatSvc, redisSvc, cfg.Host, cfg.PassKey)
 
 	// init handler
 	prayerTimeHandler := handler.NewHandler(prayerTimeSvc)
