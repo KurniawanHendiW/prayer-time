@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/prayer-time/service/prayerTime"
@@ -25,13 +26,19 @@ func NewHandler(prayerTime prayerTime.Service) Handler {
 func (h *handler) GetKeyPrayerTime(c *gin.Context) {
 	var req prayerTime.KeyPrayerTimeRequest
 	if err := c.Bind(&req); err != nil {
-		c.JSON(http.StatusBadRequest, err.Error())
+		c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"status":  http.StatusBadRequest,
+			"message": err.Error(),
+		})
 		return
 	}
 
 	resp, err := h.prayerTime.GetKeyPrayerTime(req)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
+		c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"status":  http.StatusInternalServerError,
+			"message": err.Error(),
+		})
 		return
 	}
 
@@ -39,15 +46,12 @@ func (h *handler) GetKeyPrayerTime(c *gin.Context) {
 }
 
 func (h *handler) GetDataPrayerTime(c *gin.Context) {
-	//var dataPrayTimeRequest prayerTime.DataPrayerTimeRequest
-	//if err := c.Bind(&dataPrayTimeRequest); err != nil {
-	//	c.JSON(http.StatusBadRequest, err.Error())
-	//	return
-	//}
-
 	key := c.Query("key")
 	if key == "" {
-		c.JSON(http.StatusBadRequest, "param key is required")
+		c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"status":  http.StatusBadRequest,
+			"message": "param key is required",
+		})
 		return
 	}
 
@@ -57,7 +61,19 @@ func (h *handler) GetDataPrayerTime(c *gin.Context) {
 
 	resp, err := h.prayerTime.GetDataPrayerTime(dataPrayTimeRequest)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
+		if strings.Contains(err.Error(), "expired") {
+			c.JSON(http.StatusBadRequest, map[string]interface{}{
+				"status":  http.StatusBadRequest,
+				"message": err.Error(),
+			})
+
+			return
+		}
+
+		c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"status":  http.StatusInternalServerError,
+			"message": err.Error(),
+		})
 		return
 	}
 
