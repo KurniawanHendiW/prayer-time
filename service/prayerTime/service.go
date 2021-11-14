@@ -3,13 +3,13 @@ package prayerTime
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
 	"time"
 
-	ics "github.com/arran4/golang-ical"
+	"github.com/prayer-time/client/redis"
 	"github.com/prayer-time/client/waktusholat"
 
-	openssl "github.com/Luzifer/go-openssl/v4"
+	ics "github.com/arran4/golang-ical"
+	uuid "github.com/satori/go.uuid"
 )
 
 type Service interface {
@@ -19,12 +19,16 @@ type Service interface {
 
 type service struct {
 	waktuSholatSvc waktusholat.Service
+	redisSvc       redis.Service
+	serviceHost    string
 	passKey        string
 }
 
-func NewService(waktuSholatSvc waktusholat.Service, passKey string) Service {
+func NewService(waktuSholatSvc waktusholat.Service, redisSvc redis.Service, serviceHost, passKey string) Service {
 	return &service{
 		waktuSholatSvc: waktuSholatSvc,
+		redisSvc:       redisSvc,
+		serviceHost:    serviceHost,
 		passKey:        passKey,
 	}
 }
@@ -35,29 +39,26 @@ func (s *service) GetKeyPrayerTime(req KeyPrayerTimeRequest) (KeyPrayerTimeRespo
 		return KeyPrayerTimeResponse{}, err
 	}
 
-	o := openssl.New()
+	serial := uuid.NewV4()
 
-	enc, err := o.EncryptBytes(s.passKey, byteData, openssl.BytesToKeySHA384)
-	if err != nil {
-		fmt.Printf("An error occurred: %s\n", err)
+	if err = s.redisSvc.Set(fmt.Sprintf("prayer-time-%s", serial.String()), string(byteData)).Error; err != nil {
+		return KeyPrayerTimeResponse{}, err
 	}
 
 	return KeyPrayerTimeResponse{
-		Key: string(enc),
+		Key: serial.String(),
+		Url: fmt.Sprintf("%s/prayer-time/get?key=%s", s.serviceHost, serial.String()),
 	}, nil
 }
 
 func (s *service) GetDataPrayerTime(req DataPrayerTimeRequest) (DataPrayerTimeResponse, error) {
-	o := openssl.New()
-	req.Key = strings.Replace(req.Key, " ", "+", -1)
-
-	dec, err := o.DecryptBytes(s.passKey, []byte(req.Key), openssl.BytesToKeySHA384)
+	redisData, err := s.redisSvc.Get(fmt.Sprintf("prayer-time-%s", req.Key)).String()
 	if err != nil {
-		fmt.Printf("An error occurred: %s\n", err)
+		return DataPrayerTimeResponse{}, err
 	}
 
 	keyPrayerTimeRequest := KeyPrayerTimeRequest{}
-	if err = json.Unmarshal(dec, &keyPrayerTimeRequest); err != nil {
+	if err = json.Unmarshal([]byte(redisData), &keyPrayerTimeRequest); err != nil {
 		return DataPrayerTimeResponse{}, err
 	}
 
@@ -89,7 +90,7 @@ func (s *service) GetDataPrayerTime(req DataPrayerTimeRequest) (DataPrayerTimeRe
 	timeNow := time.Now()
 
 	cal := ics.NewCalendar()
-	cal.SetCalscale("GREGORIAN")
+	cal.SetColor("#009688")
 	cal.SetMethod(ics.MethodPublish)
 	cal.SetXWRCalName(fmt.Sprintf("Prayer time for %s - %s", resp.Results.Location.City, resp.Results.Location.Country))
 	cal.SetXWRCalDesc(fmt.Sprintf("Prayer time for %s - %s", resp.Results.Location.City, resp.Results.Location.Country))
@@ -136,13 +137,13 @@ func (s *service) addEventCalendar(cal *ics.Calendar, datetime waktusholat.DateT
 	event.SetDescription(fmt.Sprintf("Time for %s", day))
 	event.SetLocation(fmt.Sprintf("%s - %s", location.City, location.Country))
 	event.SetProperty(ics.ComponentPropertyCategories, "Prayer")
-	event.SetClass(ics.ClassificationPublic)
+	//event.SetClass(ics.ClassificationPublic)
 	event.SetTimeTransparency(ics.TransparencyTransparent)
 
 	timeStart = timeStart.Add(time.Hour * -7)
 	event.SetStartAt(timeStart)
 
-	timeEnd := timeStart.Add(time.Minute * 15)
+	timeEnd := timeStart.Add(time.Minute * 30)
 	event.SetEndAt(timeEnd)
 
 	return event, nil
