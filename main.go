@@ -32,7 +32,7 @@ func initRouter(cfg config.Config) *gin.Engine {
 		MaxIdle:   cfg.RedisMaxIdle,
 		MaxActive: cfg.RedisMaxActive,
 	})
-	prayerTimeSvc := prayerTime.NewService(waktuSholatSvc, redisSvc, cfg.Host, cfg.PassKey)
+	prayerTimeSvc := prayerTime.NewService(waktuSholatSvc, redisSvc, cfg.Host, cfg.ExpiredKey)
 
 	// init handler
 	prayerTimeHandler := handler.NewHandler(prayerTimeSvc)
