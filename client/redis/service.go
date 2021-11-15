@@ -3,6 +3,7 @@ package redis
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/garyburd/redigo/redis"
@@ -24,6 +25,10 @@ func NewService(config RedisConfig) Service {
 		redisPool: initRedis(config),
 	}
 
+	if err := s.testRedis(); err != nil {
+		log.Fatal(err)
+	}
+
 	return s
 }
 
@@ -34,15 +39,22 @@ func initRedis(config RedisConfig) *redis.Pool {
 		IdleTimeout: time.Duration(config.Timeout) * time.Second,
 		Wait:        true,
 		Dial: func() (c redis.Conn, err error) {
-			c, err = redis.Dial("tcp", fmt.Sprintf("%s:%s", config.Host, config.Port))
-			if err != nil {
-				return nil, err
-			}
-
-			if config.Password != "" {
-				if _, err = c.Do("AUTH", config.Password); err != nil {
-					c.Close()
+			if config.URL != "" {
+				c, err = redis.DialURL(config.URL, redis.DialTLSSkipVerify(true))
+				if err != nil {
 					return nil, err
+				}
+			} else {
+				c, err = redis.Dial("tcp", fmt.Sprintf("%s:%s", config.Host, config.Port))
+				if err != nil {
+					return nil, err
+				}
+
+				if config.Password != "" {
+					if _, err = c.Do("AUTH", config.Password); err != nil {
+						c.Close()
+						return nil, err
+					}
 				}
 			}
 
@@ -55,6 +67,25 @@ func initRedis(config RedisConfig) *redis.Pool {
 	}
 
 	return redisPool
+}
+
+func (s *service) testRedis() error {
+	test, err := s.Get("TEST").String()
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(test)
+
+	if err := s.Set("TEST", "TEST").Error; err != nil {
+		return err
+	}
+
+	if err := s.Del("TEST").Error; err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *service) getConnection() redis.Conn {
