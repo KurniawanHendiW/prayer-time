@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/prayer-time/client/redis"
@@ -17,8 +16,6 @@ import (
 func main() {
 	cfg := config.Get()
 
-	fmt.Printf("CONFIG: \n%+v\n\n", cfg)
-
 	router := initRouter(cfg)
 
 	util.RunServerGracefully(cfg.PORT, cfg.TimeOut, router)
@@ -28,6 +25,7 @@ func initRouter(cfg config.Config) *gin.Engine {
 	// init service
 	waktuSholatSvc := waktusholat.NewService(cfg.WaktuSholatHost)
 	redisSvc := redis.NewService(redis.RedisConfig{
+		URL:       cfg.RedisURL,
 		Host:      cfg.RedisHost,
 		Port:      cfg.RedisPort,
 		Password:  cfg.RedisPassword,
