@@ -33,4 +33,11 @@ type (
 		CountryCode string `json:"country_code"`
 		Timezone    string `json:"timezone"`
 	}
+
+	GetCityByNameResponse struct {
+		CityCode    string `json:"cityCode"`
+		CityName    string `json:"cityName"`
+		CountryCode string `json:"countryCode"`
+		CountryName string `json:"countryName"`
+	}
 )
