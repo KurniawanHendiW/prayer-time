@@ -11,6 +11,7 @@ import (
 type Handler interface {
 	GetKeyPrayerTime(c *gin.Context)
 	GetDataPrayerTime(c *gin.Context)
+	GetCityByName(c *gin.Context)
 }
 
 type handler struct {
@@ -82,4 +83,26 @@ func (h *handler) GetDataPrayerTime(c *gin.Context) {
 	c.Writer.Header().Set("Content-type", "text/calendar;charset=UTF-8")
 	c.Writer.Header().Set("Content-Disposition", "attachment; filename="+downloadName)
 	c.Writer.Write([]byte(resp.Data))
+}
+
+func (h *handler) GetCityByName(c *gin.Context) {
+	name := c.Param("name")
+	if name == "" {
+		c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"status":  http.StatusBadRequest,
+			"message": "city name is required",
+		})
+		return
+	}
+
+	resp, err := h.prayerTime.GetCityByName(name)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"status":  http.StatusInternalServerError,
+			"message": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, resp)
 }

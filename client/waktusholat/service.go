@@ -1,6 +1,7 @@
 package waktusholat
 
 import (
+	"fmt"
 	"net/http"
 	"net/url"
 
@@ -9,14 +10,37 @@ import (
 
 type Service interface {
 	GetPrayTimes(req PrayTimeRequest) (PrayTimeResponse, error)
+	GetCityByName(name string) ([]GetCityByNameResponse, error)
 }
 
 type service struct {
-	Host string
+	waktuSholatHost string
+	apiPrayZoneHost string
 }
 
-func NewService(host string) Service {
-	return &service{Host: host}
+func NewService(waktuSholatHost, apiPrayZoneHost string) Service {
+	return &service{
+		waktuSholatHost: waktuSholatHost,
+		apiPrayZoneHost: apiPrayZoneHost,
+	}
+}
+
+func (s *service) GetCityByName(name string) ([]GetCityByNameResponse, error) {
+	uri := url.URL{}
+	uri.Path = fmt.Sprintf("/api/docs/ajax/cities/%s", name)
+
+	opts := util.ReqOpts{
+		Host:        s.waktuSholatHost,
+		Method:      http.MethodGet,
+		RelativeURL: uri.String(),
+	}
+
+	var resp []GetCityByNameResponse
+	if err := util.Call(&resp, opts); err != nil {
+		return resp, err
+	}
+
+	return resp, nil
 }
 
 func (s *service) GetPrayTimes(req PrayTimeRequest) (PrayTimeResponse, error) {
@@ -31,7 +55,7 @@ func (s *service) GetPrayTimes(req PrayTimeRequest) (PrayTimeResponse, error) {
 	uri.RawQuery = query.Encode()
 
 	opts := util.ReqOpts{
-		Host:        s.Host,
+		Host:        s.apiPrayZoneHost,
 		Method:      http.MethodGet,
 		RelativeURL: uri.String(),
 	}

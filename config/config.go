@@ -21,7 +21,8 @@ type Config struct {
 	RedisMaxActive int    `envconfig:"REDIS_MAX_ACTIVE" default:"10"`
 
 	// third party
-	WaktuSholatHost string `envconfig:"WAKTU_SHOLAT_HOST" default:"https://api.pray.zone"`
+	WaktuSholatHost string `envconfig:"WAKTU_SHOLAT_HOST" default:"https://waktusholat.org"`
+	ApiPrayZoneHost string `envconfig:"API_PRAY_ZONE_HOST" default:"https://api.pray.zone"`
 }
 
 func Get() Config {

@@ -3,6 +3,7 @@ package prayerTime
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/prayer-time/client/redis"
@@ -15,6 +16,7 @@ import (
 type Service interface {
 	GetDataPrayerTime(req DataPrayerTimeRequest) (DataPrayerTimeResponse, error)
 	GetKeyPrayerTime(req KeyPrayerTimeRequest) (KeyPrayerTimeResponse, error)
+	GetCityByName(name string) ([]waktusholat.GetCityByNameResponse, error)
 }
 
 type service struct {
@@ -164,4 +166,22 @@ func (s *service) addAlarm(event *ics.VEvent, day string) {
 	alarm.SetTrigger("PT0S")
 	alarm.SetAction(ics.ActionDisplay)
 	alarm.SetProperty("DESCRIPTION", fmt.Sprintf("Time for %s", day))
+}
+
+func (s *service) GetCityByName(name string) ([]waktusholat.GetCityByNameResponse, error) {
+	respGetCity, err := s.waktuSholatSvc.GetCityByName(name)
+	if err != nil {
+		return respGetCity, err
+	}
+
+	resp := []waktusholat.GetCityByNameResponse{}
+	for _, city := range respGetCity {
+		if strings.Contains(city.CityCode, "-") {
+			continue
+		}
+
+		resp = append(resp, city)
+	}
+
+	return resp, nil
 }

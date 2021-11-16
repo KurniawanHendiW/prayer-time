@@ -26,7 +26,7 @@ func NewService(config RedisConfig) Service {
 	}
 
 	if err := s.testRedis(); err != nil {
-		log.Fatal(err)
+		log.Fatal("Error test redis: ", err.Error())
 	}
 
 	return s
