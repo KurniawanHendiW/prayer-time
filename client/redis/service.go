@@ -70,13 +70,6 @@ func initRedis(config RedisConfig) *redis.Pool {
 }
 
 func (s *service) testRedis() error {
-	test, err := s.Get("TEST").String()
-	if err != nil {
-		return err
-	}
-
-	fmt.Println(test)
-
 	if err := s.Set("TEST", "TEST").Error; err != nil {
 		return err
 	}
