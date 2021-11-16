@@ -39,8 +39,8 @@ func initRedis(config RedisConfig) *redis.Pool {
 		IdleTimeout: time.Duration(config.Timeout) * time.Second,
 		Wait:        true,
 		Dial: func() (c redis.Conn, err error) {
-			if config.URL != "" {
-				c, err = redis.DialURL(config.URL, redis.DialTLSSkipVerify(true))
+			if config.TlsUrl != "" {
+				c, err = redis.DialURL(config.TlsUrl, redis.DialTLSSkipVerify(true))
 				if err != nil {
 					return nil, err
 				}

@@ -7,7 +7,7 @@ type (
 	}
 
 	RedisConfig struct {
-		URL       string
+		TlsUrl    string
 		Host      string
 		Port      string
 		Timeout   int
