@@ -25,7 +25,7 @@ func initRouter(cfg config.Config) *gin.Engine {
 	// init service
 	waktuSholatSvc := waktusholat.NewService(cfg.WaktuSholatHost)
 	redisSvc := redis.NewService(redis.RedisConfig{
-		URL:       cfg.RedisURL,
+		TlsUrl:    cfg.RedisTlsUrl,
 		Host:      cfg.RedisHost,
 		Port:      cfg.RedisPort,
 		Password:  cfg.RedisPassword,

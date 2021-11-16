@@ -12,7 +12,7 @@ type Config struct {
 	ExpiredKey int64  `envconfig:"EXPIRED_KEY" default:"600"` // in seconds
 
 	// Redis
-	RedisURL       string `envconfig:"REDIS_URL" default:""`
+	RedisTlsUrl    string `envconfig:"REDIS_TLS_URL" default:""` // format tls url, redis://:<password>@<host>:<port>
 	RedisHost      string `envconfig:"REDIS_HOST" default:""`
 	RedisPort      string `envconfig:"redis_port" default:""`
 	RedisPassword  string `envconfig:"REDIS_PASSWORD" default:""`
