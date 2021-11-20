@@ -45,3 +45,7 @@ Example response
   }
 ]
 ```
+
+# Credits
+1. Waktu shalat https://waktusholat.org/api/docs/today
+2. GoLang iCal https://github.com/arran4/golang-ical
