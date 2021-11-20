@@ -2,7 +2,7 @@
 
 ## Rest API
 
-Get key calendar
+### Get key calendar
 ```
 [POST] https://prayer-time-calendar.herokuapp.com/prayer-time/get-key
 ```
@@ -25,12 +25,23 @@ Example response
 }
 ```
 
-Get iCal with key
+### Get iCal with key
 ```
 [GET] https://prayer-time-calendar.herokuapp.com/prayer-time/get?key=:key
 ```
 
-Get available city
+### Get available city
 ```
-[GET] GET https://prayer-time-calendar.herokuapp.com/prayer-time/get-city/:city-name
+[GET] https://prayer-time-calendar.herokuapp.com/prayer-time/get-city/:city-name
+```
+Example response
+```
+[
+  {
+    "cityCode": "jakarta",
+    "cityName": "Jakarta",
+    "countryCode": "ID",
+    "countryName": "Republic of Indonesia"
+  }
+]
 ```
