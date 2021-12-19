@@ -54,7 +54,7 @@ func initRouter(cfg config.Config) *gin.Engine {
 	{
 		route.POST("/get-key", prayerTimeHandler.GetKeyPrayerTime)
 		route.GET("/get", prayerTimeHandler.GetDataPrayerTime)
-		route.GET("/get-city/:name", prayerTimeHandler.GetCityByName)
+		route.GET("/get-city", prayerTimeHandler.GetCityByName)
 	}
 
 	return router
