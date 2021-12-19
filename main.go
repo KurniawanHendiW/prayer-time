@@ -40,6 +40,8 @@ func initRouter(cfg config.Config) *gin.Engine {
 
 	router := gin.Default()
 
+	router.Use(util.CORSMiddleware())
+
 	router.LoadHTMLGlob("views/pages/*")
 	router.Static("/css", "./views/assets/css")
 	router.Static("/js", "./views/assets/js")
