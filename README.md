@@ -32,7 +32,7 @@ Example response
 
 ### Get available city
 ```
-[GET] https://prayer-time-calendar.herokuapp.com/prayer-time/get-city/:city-name
+[GET] https://prayer-time-calendar.herokuapp.com/prayer-time/get-city?name=jakarta
 ```
 Example response
 ```
