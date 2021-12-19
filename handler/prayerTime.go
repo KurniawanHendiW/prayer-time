@@ -86,7 +86,7 @@ func (h *handler) GetDataPrayerTime(c *gin.Context) {
 }
 
 func (h *handler) GetCityByName(c *gin.Context) {
-	name := c.Param("name")
+	name := c.Query("name")
 	if name == "" {
 		c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"status":  http.StatusBadRequest,
