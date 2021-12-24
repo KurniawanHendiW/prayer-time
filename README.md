@@ -1,5 +1,7 @@
 # prayer-time-calendar
 
+iCal URL supports in google calendar, outlook calendar, and calendar app on macOS.
+
 ## Rest API
 
 ### Get key calendar
