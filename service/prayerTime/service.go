@@ -90,8 +90,17 @@ func (s *service) GetDataPrayerTime(req DataPrayerTimeRequest) (DataPrayerTimeRe
 		requestDay = MapDay
 	}
 
+	city, err := s.GetCityByName(keyPrayerTimeRequest.City)
+	if err != nil {
+		return DataPrayerTimeResponse{}, err
+	}
+
+	if len(city) == 0 {
+		return DataPrayerTimeResponse{}, fmt.Errorf("city %s not found", keyPrayerTimeRequest.City)
+	}
+
 	resp, err := s.waktuSholatSvc.GetPrayTimes(waktusholat.PrayTimeRequest{
-		City:      keyPrayerTimeRequest.City,
+		City:      city[0].CityCode,
 		StartDate: keyPrayerTimeRequest.StartDate,
 		EndDate:   keyPrayerTimeRequest.EndDate,
 	})
@@ -130,7 +139,7 @@ func (s *service) GetDataPrayerTime(req DataPrayerTimeRequest) (DataPrayerTimeRe
 		}
 	}
 
-	return DataPrayerTimeResponse{Data: cal.Serialize()}, nil
+	return DataPrayerTimeResponse{Data: cal.Serialize(), Filename: fmt.Sprintf("%_%s.ics", city[0].CityName, city[0].CountryName)}, nil
 }
 
 func (s *service) addEventCalendar(cal *ics.Calendar, datetime waktusholat.DateTime, location waktusholat.Location, day string, timeNow time.Time) (*ics.VEvent, error) {

@@ -43,6 +43,7 @@ type (
 	}
 
 	DataPrayerTimeResponse struct {
-		Data string `json:"data"`
+		Data     string `json:"data"`
+		Filename string `json:"filename"`
 	}
 )

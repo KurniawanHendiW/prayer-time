@@ -78,10 +78,8 @@ func (h *handler) GetDataPrayerTime(c *gin.Context) {
 		return
 	}
 
-	downloadName := "Jakarta_Indonesia.ics"
-
 	c.Writer.Header().Set("Content-type", "text/calendar;charset=UTF-8")
-	c.Writer.Header().Set("Content-Disposition", "attachment; filename="+downloadName)
+	c.Writer.Header().Set("Content-Disposition", "attachment; filename="+resp.Filename)
 	c.Writer.Write([]byte(resp.Data))
 }
 
