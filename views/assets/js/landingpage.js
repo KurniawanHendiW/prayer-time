@@ -16,26 +16,6 @@ function scrollFunction() {
 
 var dataResult = null
 // OWL-CAROUSAL
-$('.owl-carousel').owlCarousel({
-    items: 3,
-    loop:true,
-    nav:false,
-    dot:true,
-    autoplay: true,
-    slideTransition: 'linear',
-    autoplayHoverPause: true,
-    responsive:{
-      0:{
-          items:1
-      },
-      600:{
-          items:2
-      },
-      1000:{
-          items:3
-      }
-  }
-})
 
 function copyData(){
   /* Get the text field */
@@ -139,18 +119,6 @@ $(document).ready(function() {
 
   
 });
-
-// AOS
-AOS.init({
-    offset: 120, 
-    delay: 0,
-    duration: 1200, 
-    easing: 'ease', 
-    once: true, 
-    mirror: false, 
-    anchorPlacement: 'top-bottom', 
-    disable: "mobile"
-  });
 
 //SIDEBAR-OPEN
   $('#navbarSupportedContent').on('hidden.bs.collapse', function () {
