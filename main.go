@@ -43,8 +43,11 @@ func initRouter(cfg config.Config) *gin.Engine {
 	router.Use(util.CORSMiddleware())
 
 	router.LoadHTMLGlob("views/pages/*")
+	router.StaticFile("/favicon.ico", "./views/assets/images/favicon.ico")
 	router.Static("/css", "./views/assets/css")
 	router.Static("/js", "./views/assets/js")
+	router.Static("/images", "./views/assets/images")
+	router.Static("/fonts", "./views/assets/fonts")
 
 	router.GET("/index", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.html", gin.H{

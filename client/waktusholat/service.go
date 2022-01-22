@@ -51,6 +51,7 @@ func (s *service) GetPrayTimes(req PrayTimeRequest) (PrayTimeResponse, error) {
 	query.Set("city", req.City)
 	query.Set("start", req.StartDate)
 	query.Set("end", req.EndDate)
+	query.Set("school", "3")
 
 	uri.RawQuery = query.Encode()
 
