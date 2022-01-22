@@ -45,6 +45,7 @@ func initRouter(cfg config.Config) *gin.Engine {
 	router.LoadHTMLGlob("views/pages/*")
 	router.Static("/css", "./views/assets/css")
 	router.Static("/js", "./views/assets/js")
+	router.Static("/images", "./views/assets/images")
 
 	router.GET("/index", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.html", gin.H{
