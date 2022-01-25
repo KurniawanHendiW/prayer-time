@@ -16,12 +16,14 @@ type Service interface {
 type service struct {
 	waktuSholatHost string
 	apiPrayZoneHost string
+	debugLog        bool
 }
 
-func NewService(waktuSholatHost, apiPrayZoneHost string) Service {
+func NewService(waktuSholatHost, apiPrayZoneHost string, debugLog bool) Service {
 	return &service{
 		waktuSholatHost: waktuSholatHost,
 		apiPrayZoneHost: apiPrayZoneHost,
+		debugLog:        debugLog,
 	}
 }
 
@@ -36,7 +38,7 @@ func (s *service) GetCityByName(name string) ([]GetCityByNameResponse, error) {
 	}
 
 	var resp []GetCityByNameResponse
-	if err := util.Call(&resp, opts); err != nil {
+	if err := util.Call(&resp, opts, s.debugLog); err != nil {
 		return resp, err
 	}
 
@@ -51,7 +53,7 @@ func (s *service) GetPrayTimes(req PrayTimeRequest) (PrayTimeResponse, error) {
 	query.Set("city", req.City)
 	query.Set("start", req.StartDate)
 	query.Set("end", req.EndDate)
-	query.Set("school", "3")
+	query.Set("school", fmt.Sprint(SchoolMap[req.Country]))
 
 	uri.RawQuery = query.Encode()
 
@@ -62,7 +64,7 @@ func (s *service) GetPrayTimes(req PrayTimeRequest) (PrayTimeResponse, error) {
 	}
 
 	var resp PrayTimeResponse
-	if err := util.Call(&resp, opts); err != nil {
+	if err := util.Call(&resp, opts, s.debugLog); err != nil {
 		return resp, err
 	}
 

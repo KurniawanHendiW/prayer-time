@@ -10,6 +10,7 @@ type Config struct {
 	PORT       int    `envconfig:"PORT" default:"80"`
 	TimeOut    int    `envconfig:"TIME_OUT" default:"3"`
 	ExpiredKey int64  `envconfig:"EXPIRED_KEY" default:"600"` // in seconds
+	DebugLog   bool   `envconfig:"DEBUG_LOG" default:"true"`
 
 	// Redis
 	RedisTlsUrl    string `envconfig:"REDIS_TLS_URL" default:""` // format tls url, redis://:<password>@<host>:<port>

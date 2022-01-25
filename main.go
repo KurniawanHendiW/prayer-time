@@ -23,7 +23,7 @@ func main() {
 
 func initRouter(cfg config.Config) *gin.Engine {
 	// init service
-	waktuSholatSvc := waktusholat.NewService(cfg.WaktuSholatHost, cfg.ApiPrayZoneHost)
+	waktuSholatSvc := waktusholat.NewService(cfg.WaktuSholatHost, cfg.ApiPrayZoneHost, cfg.DebugLog)
 	redisSvc := redis.NewService(redis.RedisConfig{
 		TlsUrl:    cfg.RedisTlsUrl,
 		Host:      cfg.RedisHost,

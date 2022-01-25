@@ -103,6 +103,7 @@ func (s *service) GetDataPrayerTime(req DataPrayerTimeRequest) (DataPrayerTimeRe
 		City:      city[0].CityCode,
 		StartDate: keyPrayerTimeRequest.StartDate,
 		EndDate:   keyPrayerTimeRequest.EndDate,
+		Country:   city[0].CountryName,
 	})
 	if err != nil {
 		return DataPrayerTimeResponse{}, err
