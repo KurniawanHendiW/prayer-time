@@ -37,6 +37,20 @@ func NewService(waktuSholatSvc waktusholat.Service, redisSvc redis.Service, serv
 }
 
 func (s *service) GetKeyPrayerTime(req KeyPrayerTimeRequest) (KeyPrayerTimeResponse, error) {
+	timeStart, err := time.Parse("2006-01-02", req.StartDate)
+	if err != nil {
+		return KeyPrayerTimeResponse{}, err
+	}
+
+	timeEnd, err := time.Parse("2006-01-02", req.EndDate)
+	if err != nil {
+		return KeyPrayerTimeResponse{}, err
+	}
+
+	if timeStart.After(timeEnd) {
+		return KeyPrayerTimeResponse{}, fmt.Errorf("end date must be greater than start date")
+	}
+
 	byteData, err := json.Marshal(req)
 	if err != nil {
 		return KeyPrayerTimeResponse{}, err
