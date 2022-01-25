@@ -3,6 +3,7 @@ package prayerTime
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"strings"
 	"time"
 
@@ -100,9 +101,10 @@ func (s *service) GetDataPrayerTime(req DataPrayerTimeRequest) (DataPrayerTimeRe
 	}
 
 	resp, err := s.waktuSholatSvc.GetPrayTimes(waktusholat.PrayTimeRequest{
-		City:      city[0].CityCode,
-		StartDate: keyPrayerTimeRequest.StartDate,
-		EndDate:   keyPrayerTimeRequest.EndDate,
+		City:        city[0].CityCode,
+		StartDate:   keyPrayerTimeRequest.StartDate,
+		EndDate:     keyPrayerTimeRequest.EndDate,
+		CountryCode: city[0].CountryCode,
 	})
 	if err != nil {
 		return DataPrayerTimeResponse{}, err
@@ -178,6 +180,21 @@ func (s *service) addAlarm(event *ics.VEvent, day string) {
 }
 
 func (s *service) GetCityByName(name string) ([]waktusholat.GetCityByNameResponse, error) {
+	redisData, err := s.redisSvc.Get(fmt.Sprintf("city-%s", name)).String()
+	if err != nil {
+		log.Printf("Failed get cache city %s: %s\n", name, err.Error())
+	}
+
+	if redisData != "" {
+		resp := []waktusholat.GetCityByNameResponse{}
+		if err = json.Unmarshal([]byte(redisData), &resp); err != nil {
+			log.Printf("failed unmarshal cache city: %s\n", err.Error())
+		} else {
+			log.Printf("get city from cache %s\n", name)
+			return resp, nil
+		}
+	}
+
 	respGetCity, err := s.waktuSholatSvc.GetCityByName(name)
 	if err != nil {
 		return respGetCity, err
@@ -189,8 +206,35 @@ func (s *service) GetCityByName(name string) ([]waktusholat.GetCityByNameRespons
 			continue
 		}
 
+		prayTime, err := s.waktuSholatSvc.GetPrayTimes(waktusholat.PrayTimeRequest{
+			City:        city.CityCode,
+			StartDate:   time.Now().Format("2006-01-02"),
+			EndDate:     time.Now().Format("2006-01-02"),
+			CountryCode: city.CountryCode,
+		})
+
+		if err != nil || len(prayTime.Results.Datetime) == 0 {
+			continue
+		}
+
 		resp = append(resp, city)
 	}
+
+	go func() {
+		byteData, err := json.Marshal(resp)
+		if err != nil {
+			return
+		}
+
+		redisKey := fmt.Sprintf("city-%s", name)
+		if err = s.redisSvc.Set(redisKey, string(byteData)).Error; err != nil {
+			log.Printf("Failed set cache city %s - %s\n", name, redisKey)
+		}
+
+		if err = s.redisSvc.Expire(redisKey, 86400).Error; err != nil { // 1 day
+			log.Printf("Failed set expired cache city %s - %s\n", name, redisKey)
+		}
+	}()
 
 	return resp, nil
 }
