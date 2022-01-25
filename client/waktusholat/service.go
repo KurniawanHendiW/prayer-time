@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"time"
 
 	"github.com/prayer-time/util"
 )
@@ -46,14 +47,30 @@ func (s *service) GetCityByName(name string) ([]GetCityByNameResponse, error) {
 }
 
 func (s *service) GetPrayTimes(req PrayTimeRequest) (PrayTimeResponse, error) {
+	timeStart, err := time.Parse("2006-01-02", req.StartDate)
+	if err != nil {
+		return PrayTimeResponse{}, err
+	}
+
+	timeEnd, err := time.Parse("2006-01-02", req.EndDate)
+	if err != nil {
+		return PrayTimeResponse{}, err
+	}
+
+	if timeStart.After(timeEnd) {
+		return PrayTimeResponse{}, fmt.Errorf("end date must be greater than start date")
+	}
+
 	uri := url.URL{}
 	uri.Path = "/v2/times/dates.json"
+
+	school := SchoolMap[req.CountryCode]
 
 	query := uri.Query()
 	query.Set("city", req.City)
 	query.Set("start", req.StartDate)
 	query.Set("end", req.EndDate)
-	query.Set("school", fmt.Sprint(SchoolMap[req.Country]))
+	query.Set("school", fmt.Sprint(school.ID))
 
 	uri.RawQuery = query.Encode()
 

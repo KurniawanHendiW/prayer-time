@@ -49,7 +49,7 @@ func initRouter(cfg config.Config) *gin.Engine {
 	router.Static("/images", "./views/assets/images")
 	router.Static("/fonts", "./views/assets/fonts")
 
-	router.GET("/index", func(c *gin.Context) {
+	router.GET("", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.html", gin.H{
 			"title": "Prayer Time For Calendar",
 		})
