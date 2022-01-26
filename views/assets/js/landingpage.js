@@ -93,7 +93,6 @@ $(document).ready(function() {
   });
 
   $("#get_data").click(function(){
-    console.log("HAHAHAHAHAHAH")
     
     var form = document.querySelector('#prayerForm');
     var formData = new FormData(form);
@@ -120,7 +119,6 @@ $(document).ready(function() {
           $("#message").html(data.responseJSON.message);
           $(".url-group").css("display", "none");
           $(".result-group").css("display", "block");
-          console.log(status);
         });
   });
 
