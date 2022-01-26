@@ -93,6 +93,7 @@ $(document).ready(function() {
   });
 
   $("#get_data").click(function(){
+    console.log("HAHAHAHAHAHAH")
     
     var form = document.querySelector('#prayerForm');
     var formData = new FormData(form);
@@ -108,13 +109,19 @@ $(document).ready(function() {
     $.post("https://prayer-time-calendar.herokuapp.com/prayer-time/get-key",
     params,
     function(data, status){
-      // alert("Data: " + data + "\nStatus: " + status);
       window.dataResult = data
       $(".result-url").val(data.url)
       $("#message").html(data.message)
+      $(".url-group").css("display", "block");
       $(".result-group").css("display", "block");
       console.log(window.dataResult , status);
-    });
+    })
+        .fail(function (data, status) {
+          $("#message").html(data.responseJSON.message);
+          $(".url-group").css("display", "none");
+          $(".result-group").css("display", "block");
+          console.log(status);
+        });
   });
 
   
